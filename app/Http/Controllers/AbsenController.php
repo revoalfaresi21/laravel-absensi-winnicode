@@ -15,6 +15,8 @@ class AbsenController extends Controller
     public function save(Request $request){
         $request->validate([
             'nama' => 'required',
+            'jabatan' => 'required',
+            'asal_instansi' => 'required',
         ]);
 
         dd($request->all());

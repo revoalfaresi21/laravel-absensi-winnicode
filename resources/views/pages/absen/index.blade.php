@@ -49,6 +49,30 @@
                     <div class="text-danger">{{$message}}</div>
                     @enderror
                   </div>
+                  <div class="mb-3">
+                    <label for="jabatan">Jabatan</label>
+                    <input type="text" class="form-control" id='jabatan' name="jabatan">
+                    @error('jabatan')
+                    <div class="text-danger">{{$message}}</div>
+                    @enderror
+                  </div>
+                  <div class="mb-3">
+                    <label for="asal_instansi">Asal Instansi</label>
+                    <input type="text" class="form-control" id='asal_instansi' name="asal_instansi">
+                    @error('asal_instansi')
+                    <div class="text-danger">{{$message}}</div>
+                    @enderror
+                  </div>
+                  <div>
+                    <label for="tanda_tangan">Tanda Tangan</label>
+                    <div class="d-block form-control mb-2">
+                      <canvas id="signature-pad" class="signature pad"></canvas>
+                    </div>
+                    <textarea name="signature" id="signature64" class="d-none"></textarea>
+                    @error('signature')
+                      <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                  </div>
                   <button type="submit" class="btn btn-primary">
                     Submit
                   </button>
@@ -70,6 +94,24 @@
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-ndDqU0Gzau9qJ1lfW4pNLlhNTkCfHzAVBReH9diLvGRem5+R9g2FzA8ZGN954O5Q" crossorigin="anonymous">
+    </script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer">
+    </script>
+
+    <script> src="{{asset('js/signature.min.js')}}"</script>
+
+    <script>
+      $(function(){
+        // set signature pad width
+        let sig = #('signature-pad').parent().width();
+        $('#signature-pad').attr('width', sig);
+
+        let signaturePad= new SignaturePad(document.getElementById('signature-pad'), {
+          backgroundColor: 'rgb(255, 255, 255)',
+          penColor: 'rgba(255, 0, 0, 1)',
+        });
+      })
     </script>
   </body>
 </html>
