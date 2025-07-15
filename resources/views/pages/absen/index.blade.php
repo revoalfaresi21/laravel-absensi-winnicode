@@ -66,7 +66,7 @@
                   <div>
                     <label for="tanda_tangan">Tanda Tangan</label>
                     <div class="d-block form-control mb-2">
-                      <canvas id="signature-pad" class="signature pad"></canvas>
+                      <canvas id="signature-pad" class="signature-pad"></canvas>
                     </div>
                     <textarea name="signature" id="signature64" class="d-none"></textarea>
                     @error('signature')
@@ -99,17 +99,22 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js" integrity="sha512-v2CJ7UaYy4JwqLDIrZUI/4hqeoQieOmAZNXBeQyjo21dadnwR+8ZaIJVT8EE2iyI61OV8e6M8PP2/4hpQINQ/g==" crossorigin="anonymous" referrerpolicy="no-referrer">
     </script>
 
-    <script> src="{{asset('js/signature.min.js')}}"</script>
+    <script src="{{ asset('js/signature.min.js') }}"></script>
 
     <script>
       $(function(){
-        // set signature pad width
-        let sig = #('signature-pad').parent().width();
-        $('#signature-pad').attr('width', sig);
+        // set signature pad width & height
+        let sigWidth = $('#signature-pad').parent().width();
+        $('#signature-pad').attr('width', sigWidth);
+        $('#signature-pad').attr('height', 200);
 
-        let signaturePad= new SignaturePad(document.getElementById('signature-pad'), {
+        let signaturePad = new SignaturePad(document.getElementById('signature-pad'), {
           backgroundColor: 'rgb(255, 255, 255)',
-          penColor: 'rgba(255, 0, 0, 1)',
+          penColor: 'rgb(0, 0, 0)',
+        });
+
+        $('canvas').on('mouseup touchend', function(){
+          $('#signature64').val(signaturePad.toDataURL());
         });
       })
     </script>
