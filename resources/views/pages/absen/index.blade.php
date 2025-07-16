@@ -96,6 +96,7 @@
               <thead>
                 <tr>
                   <th>No.</th>
+                  <th>Tanggal</th>
                   <th>Nama</th>
                   <th>Jabatan</th>
                   <th>Asal Instansi</th>
@@ -111,6 +112,9 @@
               @foreach ($presenceDetails as $detail)
                 <tr>
                   <td>{{$loop->iteration}}</td>
+                  <td>
+                    {{ date('d/m/Y H:i', strtotime($presence->created_at)) }}
+                  </td>
                   <td>{{$detail->nama}}</td>
                   <td>{{$detail->jabatan}}</td>
                   <td>{{$detail->asal_instansi}}</td>

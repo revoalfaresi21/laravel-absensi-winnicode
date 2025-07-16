@@ -12,7 +12,8 @@ Route::get('/', function () {
 
 // admin
 Route::resource('presence', PresenceController::class);
-Route::delete('presense-detail/{id}',[PresenceDetailController::class, 'destroy'])->name('presence.detail.destroy'); 
+Route::delete('presense-detail/{id}',[PresenceDetailController::class, 'destroy'])->name('presence.detail.destroy');
+Route::get('presence/export-pdf/{id}', [PresenceDetailController::class, 'exportPdf'])->name('presence-detail.export-pdf'); 
 
 // publik
 Route::get('absen/{slug}', [AbsenController::class, 'index'])->name('absen.index');
