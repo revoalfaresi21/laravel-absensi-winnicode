@@ -15,6 +15,5 @@ Route::resource('presence', PresenceController::class);
 Route::delete('presense-detail/{id}',[PresenceDetailController::class, 'destroy'])->name('presence.detail.destroy'); 
 
 // publik
-
 Route::get('absen/{slug}', [AbsenController::class, 'index'])->name('absen.index');
-Route::post('absen/save', [AbsenController::class, 'save'])->name('absen.save');
+Route::post('absen/save/{id}', [AbsenController::class, 'save'])->name('absen.save');

@@ -40,7 +40,7 @@
                 <h5 class="card-title">Form Absensi</h5>
               </div>
               <div class="card-body">
-                <form action="{{ route('absen.save') }}" method="post">
+                <form id="form-absen" action="{{ route('absen.save', $presence->id) }}" method="post">
                   @csrf
                   <div class="mb-3">
                     <label for="nama">Nama</label>
@@ -63,7 +63,7 @@
                     <div class="text-danger">{{$message}}</div>
                     @enderror
                   </div>
-                  <div>
+                  <div class="mb-3">
                     <label for="tanda_tangan">Tanda Tangan</label>
                     <div class="d-block form-control mb-2">
                       <canvas id="signature-pad" class="signature-pad"></canvas>
@@ -72,6 +72,12 @@
                     @error('signature')
                       <div class="text-danger">{{ $message }}</div>
                     @enderror
+                    <button type="button" id="clear" class="btn btn-sm btn-secondary" >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-trash-fill" viewBox="0 0 16 16">
+                        <path d="M2.5 1a1 1 0 0 0-1 1v1a1 1 0 0 0 1 1H3v9a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V4h.5a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H10a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1zm3 4a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 .5-.5M8 5a.5.5 0 0 1 .5.5v7a.5.5 0 0 1-1 0v-7A.5.5 0 0 1 8 5m3 .5v7a.5.5 0 0 1-1 0v-7a.5.5 0 0 1 1 0"/>
+                      </svg>
+                      Clear
+                    </button>
                   </div>
                   <button type="submit" class="btn btn-primary">
                     Submit
@@ -86,7 +92,38 @@
                 <h5 class="card-title">Daftar Kehadiran</h5>
               </div>
             <div class="card-body">
-
+              <table class="table table-striped">
+              <thead>
+                <tr>
+                  <th>No.</th>
+                  <th>Nama</th>
+                  <th>Jabatan</th>
+                  <th>Asal Instansi</th>
+                  <th>Tanda Tangan</th>
+                </tr>
+              </thead>
+              <tbody>
+              @if ($presenceDetails->isEmpty())
+                <tr>
+                  <td colspan="5" class="text-center">Tidak ada data</td> 
+                </tr>
+              @endif
+              @foreach ($presenceDetails as $detail)
+                <tr>
+                  <td>{{$loop->iteration}}</td>
+                  <td>{{$detail->nama}}</td>
+                  <td>{{$detail->jabatan}}</td>
+                  <td>{{$detail->asal_instansi}}</td>
+                  <td>
+                    @if($detail->tanda_tangan)
+                      <img src="{{ asset('uploads/' . $detail->tanda_tangan) }}" 
+                      alt="Tanda Tangan" width="100">
+                    @endif
+                  </td>
+                </tr>
+                @endforeach
+              </tbody>
+                </table>
           </div>
           </div>
         </div>
@@ -104,18 +141,36 @@
     <script>
       $(function(){
         // set signature pad width & height
-        let sigWidth = $('#signature-pad').parent().width();
-        $('#signature-pad').attr('width', sigWidth);
+        let sig = $('#signature-pad').parent().width();
+        $('#signature-pad').attr('width', sig);
         $('#signature-pad').attr('height', 200);
 
+        // set canvas color
         let signaturePad = new SignaturePad(document.getElementById('signature-pad'), {
           backgroundColor: 'rgb(255, 255, 255)',
           penColor: 'rgb(0, 0, 0)',
         });
 
+        // Fill signaturte to textarea
         $('canvas').on('mouseup touchend', function(){
           $('#signature64').val(signaturePad.toDataURL());
         });
+
+        // Clear signature pad
+        $('#clear').on('click', function(e){
+          e.preventDefault();
+          signaturePad.clear();
+          $('#signature64').val('');
+        });
+
+        // submit form
+        $('#form-absen').on('submit', function(){
+          e.preventDefault();
+          if(signaturePad.isEmpty()){
+            $(this).find('button[type="submit"]').attr('disabled', 'disabled');
+          }
+        });
+
       })
     </script>
   </body>
