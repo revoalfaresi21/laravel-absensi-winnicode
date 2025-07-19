@@ -2,20 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\DataTables\PresencesDataTable;
 use App\Models\Presence;
 use App\Models\PresenceDetail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
-class PresenceController extends Controller
-{
+class PresenceController extends Controller{
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(PresencesDataTable $dataTable)
     {
-        $presences = Presence::all();
-        return view('pages.presence.index', compact('presences'));
+        // $presences = Presence::all();
+        return $dataTable->render('pages.presence.index');
     }
 
     /**
@@ -92,8 +93,18 @@ class PresenceController extends Controller
      */
     public function destroy(string $id)
     {
+        // Delete presence detail absen
+        $presenceDetails = PresenceDetail::where('presence_id', $id)->get();
+        foreach ($presenceDetails as $pd) {
+            if ($pd->tanda_tangan) {
+                Storage::disk('public_uploads')->delete($pd->tanda_tangan);
+            }
+            $pd->delete();
+        }
+        
+        // Delete kegiatan
         Presence::destroy($id);
-
-        return redirect()->route('presence.index');
+        
+        return response()->json(['status' => 'success', 'message' => 'Data berhasil dihapus.']);
     }
 }
