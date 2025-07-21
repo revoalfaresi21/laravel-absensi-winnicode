@@ -4,8 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PresenceDetail extends Model
-{
+class PresenceDetail extends Model{
     protected $fillable = [
         'presence_id',
         'nama',
@@ -13,4 +12,8 @@ class PresenceDetail extends Model
         'asal_instansi',
         'tanda_tangan',
     ];
+
+    public function presence(){
+        return $this->belongsTo(Presence::class);
+    }
 }

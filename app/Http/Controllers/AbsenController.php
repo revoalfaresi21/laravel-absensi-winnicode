@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\DataTables\AbsenDataTable;
 use App\Models\Presence;
 use App\Models\PresenceDetail;
 use Illuminate\Http\Request;
@@ -9,11 +9,14 @@ use Illuminate\Support\Facades\Storage;
 
 class AbsenController extends Controller
 {
-    public function index($slug)
-    {
+    public function index($slug, AbsenDataTable $dataTable){
         $presence = Presence::where('slug', $slug)->first();
-        $presenceDetails = PresenceDetail::where('presence_id', $presence->id)->get();
-        return view('pages.absen.index', compact('presence', 'presenceDetails'));
+        
+        if (!$presence) {
+            abort(404, 'Presence not found');
+        }
+        
+        return $dataTable->render('pages.absen.index', compact('presence'));
     }
     public function save(Request $request, string $id){
         

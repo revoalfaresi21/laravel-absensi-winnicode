@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\DataTables\PresencesDataTable;
+use App\DataTables\PresenceDetailsDataTable;
 use App\Models\Presence;
 use App\Models\PresenceDetail;
 use Illuminate\Http\Request;
@@ -52,11 +53,10 @@ class PresenceController extends Controller{
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $id, PresenceDetailsDataTable $dataTable)
     {   
         $presence = Presence::findOrFail($id);
-        $presenceDetails = PresenceDetail::where('presence_id', $id)->get();
-        return view('pages.presence.detail.index', compact('presence', 'presenceDetails'));
+        return $dataTable->render('pages.presence.detail.index', compact('presence'));
     }
 
     /**

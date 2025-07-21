@@ -2,6 +2,7 @@
 
 namespace App\DataTables;
 
+use App\Models\PresenceDetail;
 use App\Models\Presence;
 use Illuminate\Database\Eloquent\Builder as QueryBuilder;
 use Yajra\DataTables\EloquentDataTable;
@@ -12,41 +13,42 @@ use Yajra\DataTables\Html\Editor\Editor;
 use Yajra\DataTables\Html\Editor\Fields;
 use Yajra\DataTables\Services\DataTable;
 
-class PresencesDataTable extends DataTable{
+class AbsenDataTable extends DataTable
+{
     /**
      * Build the DataTable class.
      *
-     * @param QueryBuilder<Presence> $query Results from query() method.
+     * @param QueryBuilder<PresenceDetail> $query Results from query() method.
      */
     public function dataTable(QueryBuilder $query): EloquentDataTable
     {
         return (new EloquentDataTable($query))
             ->addIndexColumn()
-            ->addColumn('tgl', function($query){
-                return date('d F Y', strtotime($query->tgl_kegiatan));
+            ->addColumn('waktu_absen', function($query){
+                return date ('d-m-Y H:i:s', strtotime($query->created_at));
             })
-            ->addColumn('waktu_mulai', function($query){
-                return date('H:i', strtotime($query->tgl_kegiatan));
+            ->addColumn('tanda_tangan', function($query){
+                return "<img width='100' src='".asset('uploads/' . $query->tanda_tangan)."'>";
             })
-            ->addColumn('action', function($query){
-                $btnDetail = "<a href='".route('presence.show', $query->id)."' class='btn btn-secondary'>Detail</a>";
-                $btnEdit = "<a href='".route('presence.edit', $query->id)."' class='btn btn-warning'>Edit</a>";
-                $btnDelete = "<a href='".route('presence.destroy', $query->id)."' class='btn btn-delete btn-danger'>Hapus</a>";
-
-                return "{$btnDetail} {$btnEdit} {$btnDelete}";
-            })
-
+            ->rawColumns(['tanda_tangan'])
             ->setRowId('id');
     }
 
     /**
      * Get the query source of dataTable.
      *
-     * @return QueryBuilder<Presence>
+     * @return QueryBuilder<PresenceDetail>
      */
-    public function query(Presence $model): QueryBuilder
-    {
-        return $model->newQuery();
+    public function query(PresenceDetail $model): QueryBuilder{
+        $slug = request()->segment(2);
+        $presence = Presence::where('slug', $slug)->first();
+        
+        if (!$presence) {
+            // Return empty query if presence not found
+            return $model->where('id', -1)->newQuery();
+        }
+        
+        return $model->where('presence_id', $presence->id)->newQuery();
     }
 
     /**
@@ -54,10 +56,12 @@ class PresencesDataTable extends DataTable{
      */
     public function html(): HtmlBuilder
     {
+        $slug = request()->segment(2);
         return $this->builder()
-                    ->setTableId('presences-table')
+                    ->setTableId('absen-table')
                     ->columns($this->getColumns())
-                    ->minifiedAjax()
+                    ->minifiedAjax(route('absen.index', $slug))
+                    ->dom('Bfrtip')
                     ->orderBy(1)
                     ->selectStyleSingle()
                     ->buttons([
@@ -80,14 +84,11 @@ class PresencesDataTable extends DataTable{
                 ->title('#')
                 ->addClass('text-center')
                 ->width('100'),
-            Column::make('nama_kegiatan'),
-            Column::make('tgl'),
-            Column::make('waktu_mulai'),
-            Column::computed('action')
-                  ->exportable(false)
-                  ->printable(false)
-                  ->width(250)
-                  ->addClass('text-center'),
+            Column::make('waktu_absen'),
+            Column::make('nama'),
+            Column::make('jabatan'),
+            Column::make('asal_instansi'),
+            Column::make('tanda_tangan'),
         ];
     }
 
@@ -96,6 +97,6 @@ class PresencesDataTable extends DataTable{
      */
     protected function filename(): string
     {
-        return 'Presences_' . date('YmdHis');
+        return 'Absen_' . date('YmdHis');
     }
 }

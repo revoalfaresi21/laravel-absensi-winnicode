@@ -48,52 +48,7 @@
                     <td>{{ date('H:i', strtotime($presence->tgl_kegiatan)) }}</td>
                 </tr>
             </table>
-            <table class="table table-striped">
-                <thead>
-                    <tr>
-                        <th width="50">No.</th>
-                        <th width="150">Tanggal</th>
-                        <th>Nama</th>
-                        <th>Jabatan</th>
-                        <th>Asal Instansi</th>
-                        <th width="150">Tanda Tangan</th>
-                        <th width="100">Opsi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if ($presenceDetails->isEmpty())
-                    <tr>
-                        <td colspan="7" class="text-center">Tidak ada data</td> 
-                    </tr>
-                    @endif
-                    @foreach ($presenceDetails as $detail)
-                    <tr>
-                        <td>{{$loop->iteration}}</td>
-                        <td>
-                            {{ date('d/m/Y H:i', strtotime($presence->created_at)) }}
-                        </td>
-                        <td>{{$detail->nama}}</td>
-                        <td>{{$detail->jabatan}}</td>
-                        <td>{{$detail->asal_instansi}}</td>
-                        <td>
-                            @if($detail->tanda_tangan)
-                                <img src="{{ asset('uploads/' . $detail->tanda_tangan) }}" 
-                                alt="Tanda Tangan" width="100">
-                            @endif
-                        </td>
-                        <td>
-                            <form action="{{ route('presence.detail.destroy', $detail->id) }}" method="post" class="d-inline">
-                                @csrf
-                                @method('delete')
-                                <button type="submit" class="btn btn-danger" onclick="return confirm('Apakah anda yakin ingin menghapus data ini?')">
-                                    Hapus
-                                </button>
-                            </form>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
+            {!! $dataTable->table() !!}
         </div>
     </div>
 </div>
@@ -105,5 +60,34 @@
         navigator.clipboard.writeText("{{ route('absen.index', $presence->slug) }}");
         alert('Link berhasil disalin ke clipboard!')
       }
+    </script>
+
+    {{ $dataTable->scripts(attributes: ['type' => 'module']) }}
+    
+    <script>
+        $(document).ready(function(){
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
+            });
+        });
+        $(document).on('click', '.btn-delete', function(e){
+            e.preventDefault();
+            let url = $(this).attr('href');
+
+            if(confirm('Apakah Anda yakin ingin menghapus data ini?')) {
+                $.ajax({
+                    type: 'DELETE',
+                    url: url,
+                    success: function(data) {
+                        window.location.reload();
+                    },
+                    error: function(xhr, status, error) {
+                        console.log(error);
+                    }
+                });
+            }
+        });
     </script>
 @endpush
